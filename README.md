@@ -1,2 +1,1 @@
-# 2023_graphics
-Computer Graphics
+# Computer Graphics
