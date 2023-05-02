@@ -131,7 +131,11 @@ void compose_imgui_frame()
     ImGui::Begin("콘트롤(control)");
 
     // TODO
-    ImGui::SliderFloat("translate", &g_vec_model_translate[0], -3.0f, 3.0f);
+    ImGui::SliderFloat3("translate", &g_vec_model_translate[0], -3.0f, 3.0f);
+    
+    ImGui::gizmo3D("Rotation", g_quat_model_rotation);
+    
+    ImGui::SliderFloat3("scale", &g_vec_model_scale[0], -3.0f, 3.0f);
 
     ImGui::End();
   }
@@ -183,12 +187,18 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     g_vec_model_translate[0] += 0.1f;
   
   // TODO
+  if (key == GLFW_KEY_J && action == GLFW_PRESS)
+    g_vec_model_translate[1] -= 0.1f;
+  if (key == GLFW_KEY_K && action == GLFW_PRESS)
+    g_vec_model_translate[1] += 0.1f;
 
   // scale
   if (key == GLFW_KEY_EQUAL && action == GLFW_PRESS)
     g_vec_model_scale += 0.1f;
   
   // TODO
+  if (key == GLFW_KEY_MINUS && action == GLFW_PRESS)
+    g_vec_model_scale -= 0.1f;
 }
 
 
@@ -315,6 +325,8 @@ void set_transform()
   
   // TODO: erase the following line and write your codes to properly set g_mat_model as T*R*S
   g_mat_model = glm::translate(g_vec_model_translate);
+  g_mat_model *= glm::mat4_cast(g_quat_model_rotation);
+  g_mat_model *= glm::scale(g_vec_model_scale);
 }
 
 
@@ -359,7 +371,7 @@ void init_scene()
   g_vec_model_scale = glm::vec3(1.f);
 
   // TODO: initialize quaternion for model rotation
-  // g_quat_model_rotation = ...
+  g_quat_model_rotation = glm::quat(1.f, 0.f, 0.f, 0.f);
 
   g_fovy = 60.0f;
   g_aspect = 1.0f;
