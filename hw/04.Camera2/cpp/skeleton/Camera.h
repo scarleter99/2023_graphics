@@ -28,8 +28,7 @@ public:
   const glm::mat4  get_pose() const;
   void  set_pose(const glm::mat4& _frame);
 
-  //void  get_pose(glm::quat& _q, glm::vec3& _t) const;
-  void  get_pose(glm::quat& _q, glm::vec3& _t, glm::mat3& _m) const;
+  void  get_pose(glm::quat& _q, glm::vec3& _t) const;
   void  set_pose(const glm::quat& _q, const glm::vec3& _t);
 
   void  set_pose(const glm::vec3& _pos, const glm::vec3& _at, const glm::vec3& _up_dir);
@@ -65,6 +64,7 @@ public:
   glm::vec3  up_dir_ = glm::vec3(0.0f, 1.0f, 0.0f);
   // right direction of the camera    (it should be a unit vector whose length is 1)
   glm::vec3  right_dir_ = glm::vec3(1.0f, 0.0f, 0.0f);
+
 
   Mode  mode_ = kOrtho;
 

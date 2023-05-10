@@ -177,20 +177,8 @@ void compose_imgui_frame()
     // TODO
     glm::quat   quat_cam;
     glm::vec3   vec_cam_pos;
-    glm::mat3   mat_q2;
 
-    g_camera.get_pose(quat_cam, vec_cam_pos, mat_q2);
-
-    using namespace std;
-
-    glm::mat3 mat_q = glm::mat3_cast(quat_cam);
-    std::cout << mat_q[0][0] << mat_q[0][1] << mat_q[0][2] << endl;
-    std::cout << mat_q[1][0] << mat_q[1][1] << mat_q[1][2] << endl;
-    std::cout << mat_q[2][0] << mat_q[2][1] << mat_q[2][2] << endl;
-    std::cout << mat_q2[0][0] << mat_q2[0][1] << mat_q2[0][2] << endl;
-    std::cout << mat_q2[1][0] << mat_q2[1][1] << mat_q2[1][2] << endl;
-    std::cout << mat_q2[2][0] << mat_q2[2][1] << mat_q2[2][2] << endl;
-    std::cout << " " << endl;
+    g_camera.get_pose(quat_cam, vec_cam_pos);
 
     ImGui::SliderFloat3("Tranlsate", glm::value_ptr(vec_cam_pos), -10.0f, 10.0f);
     ImGui::gizmo3D("Rotation", quat_cam);
@@ -259,6 +247,21 @@ void compose_imgui_frame()
 void scroll_callback(GLFWwindow* window, double x, double y)
 {
   // TODO
+  float fovy = g_camera.fovy();
+  fovy -= (float)y;
+  if (fovy < 10.f)
+      fovy = 10.f;
+  if (fovy > 160.f)
+      fovy = 160.f;
+  g_camera.set_fovy(fovy);
+
+  float ortho_scale = g_camera.ortho_scale();
+  ortho_scale -= (float)y * .1f;
+  if (ortho_scale < 0.1f)
+      ortho_scale = 0.1f;
+  if (ortho_scale > 10.f)
+      ortho_scale = 10.f;
+  g_camera.set_ortho_scale(ortho_scale);
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -508,7 +511,7 @@ int main(void)
   glfwSetKeyCallback(window, key_callback);
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
   // TODO: register scroll_callback function
-
+  glfwSetScrollCallback(window, scroll_callback);
 
   init_scene();
 

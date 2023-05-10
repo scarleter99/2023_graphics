@@ -20,18 +20,17 @@ const glm::quat Camera::get_rotation() const
 void Camera::set_pose(const glm::quat& _q, const glm::vec3& _t)
 {
     glm::mat3 mat_q = glm::mat3_cast(_q);
-    front_dir_ = mat_q[2];
+    front_dir_ = -mat_q[2];
     right_dir_ = mat_q[0];
     up_dir_ = mat_q[1];
     position_ = _t;
 }
 
 // TODO: fill up the following function properly 
-void Camera::get_pose(glm::quat& _q, glm::vec3& _t, glm::mat3& _m) const
+void Camera::get_pose(glm::quat& _q, glm::vec3& _t) const
 {
-    //glm::mat3 m = glm::mat3 (right_dir_, up_dir_, front_dir_);
-    _m = glm::mat3 (right_dir_, up_dir_, front_dir_);
-    _q = glm::quat_cast(_m);
+    glm::mat3 rotation = glm::mat3 (right_dir_, up_dir_, -front_dir_);
+    _q = glm::quat_cast(rotation);
     _t = position_;
 }
 
@@ -56,6 +55,8 @@ void Camera::set_pose(const glm::mat4& _frame)
     right_dir_ = _frame[0];
     up_dir_ = _frame[1];
     position_ = _frame[3];
+
+
 }
 
 // TODO: fill up the following function properly
@@ -91,7 +92,7 @@ const glm::mat4 Camera::get_projection_matrix() const
     //       iii) aspect ratio: utilize aspect_ in the both camera modes
     //       iv) near/far clipping planes: utilize near_, far_
     if (mode_ == kOrtho)
-        return glm::ortho(-ortho_scale_, ortho_scale_, -ortho_scale_, ortho_scale_,
+        return glm::ortho(-ortho_scale_ * aspect_, ortho_scale_ * aspect_, -ortho_scale_, ortho_scale_,
                           near_, far_);
     else
         return glm::perspective(glm::radians(fovy_), aspect_, near_, far_);
