@@ -5,10 +5,12 @@ attribute vec3 a_normal;
 
 uniform mat4 u_PVM;
 
+
 // for phong shading
 uniform mat4 u_model_matrix;
 uniform mat3 u_normal_matrix;
 
+/*
 uniform vec3 u_light_position;
 uniform vec3 u_light_ambient;
 uniform vec3 u_light_diffuse;
@@ -21,11 +23,16 @@ uniform float u_obj_shininess;
 
 uniform vec3 u_camera_position;
 uniform mat4 u_view_matrix;
+*/
 
-varying vec3 v_color;
+//varying vec3 v_color;
+varying vec3 v_position_wc;
+varying vec3 v_normal_wc;
 
+/*
 vec3 directional_light() 
 {
+  
   vec3 color = vec3(0.0);
 
   vec3 position_wc = (u_model_matrix * vec4(a_position, 1.0f)).xyz;
@@ -49,10 +56,14 @@ vec3 directional_light()
 
   return color;
 }
+*/
 
 void main()
 {
   gl_Position = u_PVM * vec4(a_position, 1.0f);
-  v_color = directional_light();
+  //v_color = directional_light();
+
+  v_position_wc = (u_model_matrix * vec4(a_position, 1.0f)).xyz;
+  v_normal_wc = normalize(u_normal_matrix * a_normal);
   
 }

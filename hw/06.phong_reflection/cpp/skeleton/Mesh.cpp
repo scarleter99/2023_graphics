@@ -35,6 +35,14 @@ void Mesh::set_gl_position_buffer_()
     std::vector<glm::vec3>  tv_positions;       // per triangle-vertex 3D position (size = 3 x #triangles)
     
     // TODO: for each triangle, set tv_positions
+    tv_positions.resize(tv_indices_.size());
+
+    for (std::size_t i = 0; i < tv_indices_.size(); i+=3)
+    {
+        tv_positions[i]   = glm::vec3(pmesh_->mVertices[tv_indices_[i]].x, pmesh_->mVertices[tv_indices_[i]].y, pmesh_->mVertices[tv_indices_[i]].z);
+        tv_positions[i+1] = glm::vec3(pmesh_->mVertices[tv_indices_[i+1]].x, pmesh_->mVertices[tv_indices_[i+1]].y, pmesh_->mVertices[tv_indices_[i+1]].z);
+        tv_positions[i+2] = glm::vec3(pmesh_->mVertices[tv_indices_[i+2]].x, pmesh_->mVertices[tv_indices_[i+2]].y, pmesh_->mVertices[tv_indices_[i+2]].z);
+    }
 
     glBindBuffer(GL_ARRAY_BUFFER, position_buffer_);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*tv_positions.size(), &tv_positions[0], GL_STATIC_DRAW);
@@ -47,6 +55,14 @@ void Mesh::set_gl_color_buffer_(unsigned int cs_idx)
     std::vector<glm::vec3>  tv_colors;       // per triangle-vertex 3D position (size = 3 x #triangles)
 
     // TODO: for each triangle, set tv_colors
+    tv_colors.resize(tv_indices_.size());
+
+    for (std::size_t i = 0; i < tv_indices_.size(); i+=3)
+    {
+        tv_colors[i]   = glm::vec3(pmesh_->mColors[cs_idx][tv_indices_[i]].r, pmesh_->mColors[cs_idx][tv_indices_[i]].g, pmesh_->mColors[cs_idx][tv_indices_[i]].b);
+        tv_colors[i+1] = glm::vec3(pmesh_->mColors[cs_idx][tv_indices_[i+1]].r, pmesh_->mColors[cs_idx][tv_indices_[i+1]].g, pmesh_->mColors[cs_idx][tv_indices_[i+1]].b);
+        tv_colors[i+2] = glm::vec3(pmesh_->mColors[cs_idx][tv_indices_[i+2]].r, pmesh_->mColors[cs_idx][tv_indices_[i+2]].g, pmesh_->mColors[cs_idx][tv_indices_[i+2]].b);
+    }
 
     glBindBuffer(GL_ARRAY_BUFFER, color_buffer_);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*tv_colors.size(), &tv_colors[0], GL_STATIC_DRAW);
@@ -79,6 +95,13 @@ void Mesh::set_gl_normal_buffer_(ShadingType shading_type)
         memcpy(&v_smooth_normals[0], &pmesh_->mNormals[0], sizeof(pmesh_->mNormals[0])*pmesh_->mNumVertices);
 
     // TODO: set tv_smooth_normals from v_smooth_normals
+    tv_smooth_normals.resize(tv_indices_.size());
+    for (std::size_t i = 0; i < tv_indices_.size(); i+=3)
+    {
+        tv_smooth_normals[i]   = v_smooth_normals[tv_indices_[i]];
+        tv_smooth_normals[i+1] = v_smooth_normals[tv_indices_[i+1]];
+        tv_smooth_normals[i+2] = v_smooth_normals[tv_indices_[i+2]];
+    }
 
     glBindBuffer(GL_ARRAY_BUFFER, normal_buffer_);
     if (shading_type == kSmooth)
@@ -114,6 +137,19 @@ void Mesh::draw(int loc_a_position, int loc_a_normal)
     //          glDrawArrays(GL_TRIANGLES, ...)
     //
     //          glDisableVertexAttribArray() for loc_a_position & loc_a_normal
+
+    glBindBuffer(GL_ARRAY_BUFFER, position_buffer_);
+    glEnableVertexAttribArray(loc_a_position);
+    glVertexAttribPointer(loc_a_position, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, normal_buffer_); 
+    glEnableVertexAttribArray(loc_a_normal);
+    glVertexAttribPointer(loc_a_normal, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    glDrawArrays(GL_TRIANGLES, 0, tv_indices_.size());
+    
+    glDisableVertexAttribArray(loc_a_position);
+    glDisableVertexAttribArray(loc_a_normal);
 }
     
 void Mesh::print_info()

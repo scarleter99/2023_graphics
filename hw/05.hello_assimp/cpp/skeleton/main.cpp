@@ -177,6 +177,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     camera.move_forward(0.1f);
   if (key == GLFW_KEY_S && action == GLFW_PRESS)
     camera.move_backward(0.1f);
+
+  // save scene data
+  if (key == GLFW_KEY_P && action == GLFW_PRESS)
+    object.save_info();
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)

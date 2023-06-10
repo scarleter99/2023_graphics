@@ -81,3 +81,25 @@ void Object::print_info()
         }
     }
 }
+
+void Object::save_info()
+{
+    std::ofstream fout("temp.txt");
+    if (fout.fail()) 
+        return;
+
+    fout << "save mesh info" << std::endl;
+
+    fout << "num vertices " << pmesh_->mNumVertices << std::endl;
+    for (unsigned int i = 0; i < pmesh_->mNumVertices; ++i)
+    {
+        aiVector3D vertex = pmesh_->mVertices[i];
+        fout << "  vertex  (" << vertex.x << ", " << vertex.y << ", " << vertex.z << ")" << std::endl;
+
+        if (pmesh_->mColors[0] != NULL)
+        {
+            aiColor4D color = pmesh_->mColors[0][i];
+            fout << "  color  (" << color.r << ", " << color.g << ", " << color.b << ", " << color.a << ")" << std::endl;
+        }
+    }
+}

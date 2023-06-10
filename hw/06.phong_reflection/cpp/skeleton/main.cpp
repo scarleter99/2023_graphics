@@ -544,6 +544,22 @@ void init_shader_program()
 
   // TODO: get locations of the GPU uniform/attribute variables 
   //       for implementing Phong reflection model
+  loc_u_light_position     = glGetUniformLocation(program, "u_light_position");
+  loc_u_light_ambient      = glGetUniformLocation(program, "u_light_ambient");
+  loc_u_light_diffuse      = glGetUniformLocation(program, "u_light_diffuse");
+  loc_u_light_specular     = glGetUniformLocation(program, "u_light_specular");
+
+  loc_u_obj_ambient        = glGetUniformLocation(program, "u_obj_ambient");
+  loc_u_obj_diffuse        = glGetUniformLocation(program, "u_obj_diffuse");
+  loc_u_obj_specular       = glGetUniformLocation(program, "u_obj_specular");
+  loc_u_obj_shininess      = glGetUniformLocation(program, "u_obj_shininess");
+
+  loc_u_camera_position    = glGetUniformLocation(program, "u_camera_position");
+  loc_u_view_matrix        = glGetUniformLocation(program, "u_view_matrix");
+  loc_u_model_matrix       = glGetUniformLocation(program, "u_model_matrix");
+  loc_u_normal_matrix      = glGetUniformLocation(program, "u_normal_matrix");
+  
+  loc_a_normal             = glGetAttribLocation(program, "a_normal");
 
 }
 
@@ -560,6 +576,13 @@ void render_object()
   glUseProgram(program);
 
   // TODO : send uniform for camera & light to GPU
+  glUniformMatrix4fv(loc_u_view_matrix, 1, false, glm::value_ptr(mat_view)); 
+  glUniform3fv(loc_u_camera_position, 1, glm::value_ptr(camera.position()));
+  
+  glUniform3fv(loc_u_light_position, 1, glm::value_ptr(g_light.pos));
+  glUniform3fv(loc_u_light_ambient, 1, glm::value_ptr(g_light.ambient));
+  glUniform3fv(loc_u_light_diffuse, 1, glm::value_ptr(g_light.diffuse));
+  glUniform3fv(loc_u_light_specular, 1, glm::value_ptr(g_light.specular));
 
   for (std::size_t i = 0; i < g_models.size(); ++i)
   {
@@ -567,6 +590,21 @@ void render_object()
 
     // TODO : set mat_model, mat_normal, mat_PVM 
     // TODO : send uniform data for model to GPU
+    glm::mat4 mat_model = glm::mat4(1.0f);
+
+    mat_model = mat_model * glm::translate(glm::mat4(1.0f), model.get_translate());
+    glm::mat4 rotate;
+    model.get_rotate(rotate);
+    mat_model = mat_model * rotate;
+    mat_model = mat_model * glm::scale(glm::mat4(1.0f), model.get_scale());
+
+    glm::mat3 mat_normal = glm::mat3(mat_model); 
+
+    glm::mat4 mat_PVM = mat_proj * mat_view * mat_model;
+
+    glUniformMatrix4fv(loc_u_PVM, 1, GL_FALSE, glm::value_ptr(mat_PVM));
+    glUniformMatrix4fv(loc_u_model_matrix, 1, false, glm::value_ptr(mat_model));   
+    glUniformMatrix3fv(loc_u_normal_matrix, 1, false, glm::value_ptr(mat_normal));  
     
     model.draw(loc_a_position, loc_a_normal, loc_u_obj_ambient, loc_u_obj_diffuse, loc_u_obj_specular, loc_u_obj_shininess);
   }

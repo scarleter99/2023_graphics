@@ -13,6 +13,7 @@
 
 #include <GL/glew.h>
 #include <iostream>
+#include <fstream>
 
 struct Face
 {    
@@ -29,6 +30,7 @@ public:
     void init_buffer_objects();
     void draw(int loc_a_position, int loc_a_color); // rendering 함수: 물체를 렌더링하는 함수.
     void print_info();
+    void save_info();
 
     std::string get_name() const                { return name_; }
     void set_name(const std::string& _name)     { name_ = _name; }
